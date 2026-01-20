@@ -28,7 +28,7 @@ export const recipesApi = createApi({
 
         return `/recipes?${params.toString()}`;
       },
-      providesTags: (result) =>
+      providesTags: (result: RecipesResponse | undefined) =>
         result
           ? [
               ...result.recipes.map(({ id }) => ({ type: 'Recipe' as const, id })),
@@ -40,7 +40,7 @@ export const recipesApi = createApi({
     // Get single recipe by ID
     getRecipeById: builder.query<Recipe, number>({
       query: (id) => `/recipes/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Recipe', id }],
+      providesTags: (_result: Recipe | undefined, _error: unknown, id: number) => [{ type: 'Recipe', id }],
     }),
 
     // Create new recipe
@@ -66,7 +66,7 @@ export const recipesApi = createApi({
           'Content-Type': 'application/json',
         },
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result: Recipe | undefined, _error: unknown, { id }: UpdateRecipeRequest) => [
         { type: 'Recipe', id },
         { type: 'Recipe', id: 'LIST' },
       ],
@@ -78,7 +78,7 @@ export const recipesApi = createApi({
         url: `/recipes/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result: { isDeleted: boolean; id: number } | undefined, _error: unknown, id: number) => [
         { type: 'Recipe', id },
         { type: 'Recipe', id: 'LIST' },
       ],

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import Hero from '../components/Hero';
 import RecipeCard from '../components/RecipeCard';
+import type { Recipe } from '../types/api.types';
 
 function LandingPage() {
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -38,7 +39,7 @@ function LandingPage() {
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCurrentPage(1);
     fetchRecipes();
@@ -98,7 +99,7 @@ function LandingPage() {
           ) : (
             <>
               <div className="recipes-grid">
-                {recipes.map((recipe) => (
+                {recipes && recipes.map((recipe: Recipe) => (
                   <RecipeCard key={recipe.id} recipe={recipe} />
                 ))}
               </div>

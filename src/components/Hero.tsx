@@ -23,7 +23,7 @@ function Hero() {
             </Link>
           )}
           <button className="btn btn-outline btn-large" onClick={() => {
-            document.querySelector('.recipes-section').scrollIntoView({ behavior: 'smooth' });
+            document.querySelector('.recipes-section')?.scrollIntoView({ behavior: 'smooth' });
           }}>
             Explore Recipes
           </button>

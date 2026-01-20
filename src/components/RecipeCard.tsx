@@ -1,4 +1,6 @@
-function RecipeCard({ recipe }) {
+import type { Recipe } from '../types/api.types';
+
+function RecipeCard({ recipe }: { recipe: Recipe }) {
   return (
     <div className="recipe-card">
       <div className="recipe-image">
@@ -26,7 +28,7 @@ function RecipeCard({ recipe }) {
         </div>
         
         <div className="recipe-tags">
-          {recipe.tags?.slice(0, 3).map((tag, index) => (
+          {recipe.tags?.slice(0, 3).map((tag: string, index: number) => (
             <span key={index} className="tag">{tag}</span>
           ))}
         </div>

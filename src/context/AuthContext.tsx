@@ -1,8 +1,17 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import type { User } from '../types/api.types';
 
-const AuthContext = createContext(null);
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => void;
+  loading: boolean;
+}
 
-export const AuthProvider = ({ children }) => {
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
@@ -15,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  const fetchUserProfile = async (authToken) => {
+  const fetchUserProfile = async (authToken: string) => {
     try {
       const response = await fetch('https://dummyjson.com/auth/me', {
         method: 'GET',
@@ -38,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (username, password) => {
+  const login = async (username: string, password: string) => {
     try {
       const response = await fetch('https://dummyjson.com/auth/login', {
         method: 'POST',

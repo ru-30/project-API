@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import RecipeCard from '../components/RecipeCard';
 import RecipeForm from '../components/RecipeForm';
+import type { Recipe, CreateRecipeRequest } from '../types/api.types';
 
 function Dashboard() {
-  const { user, token } = useAuth();
-  const [recipes, setRecipes] = useState([]);
+  const { user, token } = useAuth() || { user: null, token: null };
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingRecipe, setEditingRecipe] = useState(null);
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 9;
@@ -32,7 +33,7 @@ function Dashboard() {
     }
   };
 
-  const handleCreate = async (recipeData) => {
+  const handleCreate = async (recipeData: CreateRecipeRequest) => {
     try {
       const response = await fetch('https://dummyjson.com/recipes/add', {
         method: 'POST',
@@ -55,7 +56,8 @@ function Dashboard() {
     }
   };
 
-  const handleUpdate = async (recipeData) => {
+  const handleUpdate = async (recipeData: CreateRecipeRequest) => {
+    if (!editingRecipe) return;
     try {
       const response = await fetch(`https://dummyjson.com/recipes/${editingRecipe.id}`, {
         method: 'PUT',
@@ -79,7 +81,7 @@ function Dashboard() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this recipe?')) {
       return;
     }
@@ -102,7 +104,7 @@ function Dashboard() {
     }
   };
 
-  const handleEdit = (recipe) => {
+  const handleEdit = (recipe: Recipe) => {
     setEditingRecipe(recipe);
     setShowForm(true);
   };
@@ -121,8 +123,8 @@ function Dashboard() {
           <div>
             <h1>Recipe Dashboard</h1>
             <p className="user-info">
-              Welcome back, <strong>{user?.firstName} {user?.lastName}</strong>! 
-              ({user?.email})
+              Welcome back, <strong>{user && 'firstName' in user ? user.firstName : ''} {user && 'lastName' in user ? user.lastName : ''}</strong>! 
+              ({user && 'email' in user ? user.email : ''})
             </p>
           </div>
           <button 
@@ -150,7 +152,7 @@ function Dashboard() {
         ) : (
           <>
             <div className="recipes-grid">
-              {recipes.map((recipe) => (
+              {recipes && recipes.map((recipe: Recipe) => (
                 <div key={recipe.id} className="recipe-card-wrapper">
                   <RecipeCard recipe={recipe} />
                   <div className="recipe-actions">

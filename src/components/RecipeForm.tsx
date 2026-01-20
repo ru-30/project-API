@@ -1,6 +1,11 @@
 import { useState } from 'react';
+import type { Recipe, CreateRecipeRequest } from '../types/api.types';
 
-function RecipeForm({ recipe, onSubmit, onCancel }) {
+function RecipeForm({ recipe, onSubmit, onCancel }: { 
+  recipe?: Recipe | null;
+  onSubmit: (data: CreateRecipeRequest) => void;
+  onCancel: () => void;
+}) {
   const [formData, setFormData] = useState({
     name: recipe?.name || '',
     cuisine: recipe?.cuisine || '',
@@ -15,20 +20,20 @@ function RecipeForm({ recipe, onSubmit, onCancel }) {
     instructions: recipe?.instructions?.join('\n') || ''
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    const recipeData = {
+    const recipeData: CreateRecipeRequest = {
       ...formData,
-      prepTimeMinutes: parseInt(formData.prepTimeMinutes),
-      cookTimeMinutes: parseInt(formData.cookTimeMinutes),
-      servings: parseInt(formData.servings),
-      caloriesPerServing: parseInt(formData.caloriesPerServing),
+      prepTimeMinutes: parseInt(formData.prepTimeMinutes as string),
+      cookTimeMinutes: parseInt(formData.cookTimeMinutes as string),
+      servings: parseInt(formData.servings as string),
+      caloriesPerServing: parseInt(formData.caloriesPerServing as string),
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
       ingredients: formData.ingredients.split('\n').filter(Boolean),
       instructions: formData.instructions.split('\n').filter(Boolean)
@@ -167,10 +172,10 @@ function RecipeForm({ recipe, onSubmit, onCancel }) {
           <textarea
             id="ingredients"
             name="ingredients"
-            value={formData.ingredients}
+            value={formData.ingredients as string}
             onChange={handleChange}
             required
-            rows="6"
+            rows={6}
             placeholder="2 cups flour&#10;1 cup sugar&#10;3 eggs"
           />
         </div>
@@ -180,10 +185,10 @@ function RecipeForm({ recipe, onSubmit, onCancel }) {
           <textarea
             id="instructions"
             name="instructions"
-            value={formData.instructions}
+            value={formData.instructions as string}
             onChange={handleChange}
             required
-            rows="6"
+            rows={6}
             placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;Add wet ingredients"
           />
         </div>
