@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Hero from '../components/Hero';
 import RecipeCard from '../components/RecipeCard';
 import type { Recipe } from '../types/api.types';
@@ -14,11 +14,7 @@ function LandingPage() {
   
   const limit = 9;
 
-  useEffect(() => {
-    fetchRecipes();
-  }, [currentPage, searchTerm, sortBy, order]);
-
-  const fetchRecipes = async () => {
+  const fetchRecipes = useCallback(async () => {
     setLoading(true);
     try {
       const skip = (currentPage - 1) * limit;
@@ -37,7 +33,11 @@ function LandingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, sortBy, order, limit]);
+
+  useEffect(() => {
+    fetchRecipes();
+  }, [fetchRecipes]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,6 +72,7 @@ function LandingPage() {
                 value={sortBy} 
                 onChange={(e) => setSortBy(e.target.value)}
                 className="select-input"
+                aria-label="Sort by"
               >
                 <option value="name">Name</option>
                 <option value="prepTimeMinutes">Prep Time</option>
@@ -84,6 +85,7 @@ function LandingPage() {
                 value={order} 
                 onChange={(e) => setOrder(e.target.value)}
                 className="select-input"
+                aria-label="Sort order"
               >
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import RecipeCard from '../components/RecipeCard';
 import RecipeForm from '../components/RecipeForm';
 import type { Recipe, CreateRecipeRequest } from '../types/api.types';
 
 function Dashboard() {
-  const { user, token } = useAuth() || { user: null, token: null };
+  const { user, token } = useAuth();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);

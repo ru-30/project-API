@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { User } from '../types/api.types';
 
 interface AuthContextType {
@@ -11,20 +11,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+export { AuthContext };
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (token) {
-      fetchUserProfile(token);
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
+  };
 
-  const fetchUserProfile = async (authToken: string) => {
+  const fetchUserProfile = useCallback(async (authToken: string) => {
     try {
       const response = await fetch('https://dummyjson.com/auth/me', {
         method: 'GET',
@@ -45,7 +45,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // Initialize token from localStorage only on client side
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      fetchUserProfile(storedToken);
+    } else {
+      setLoading(false);
+    }
+  }, [fetchUserProfile]);
 
   const login = async (username: string, password: string) => {
     try {
@@ -70,23 +81,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-  };
-
   return (
     <AuthContext.Provider value={{ user, token, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };
